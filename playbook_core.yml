@@ -266,7 +266,7 @@
         content: |
           --save /etc/pacman.d/mirrorlist
           --protocol http
-          --country SK,CZ
+          --country AU
           --score 20
           --sort rate
 
@@ -391,6 +391,27 @@
       when:
           - ansible_facts['virtualization_role'] == 'guest'
           - ansible_facts['virtualization_type'] == 'virtualbox'
+          
+# Proxmox  DODGY DONT USE  ---------------------------------------------------
+
+    - name: if proxmox, install guest additions
+      pacman:
+        name:
+          - qemu-guest-agent
+      when:
+          - ansible_facts['virtualization_role'] == 'guest'
+          - ansible_facts['virtualization_type'] == 'kvm'
+          
+    - name: if proxmox, enable and start qemu-guest-agent
+      systemd:
+        name: "{{ item }}"
+        enabled: yes
+        state: started
+      with_items:
+          - qemu-guest-agent.service
+      when:
+          - ansible_facts['virtualization_role'] == 'guest'
+          - ansible_facts['virtualization_type'] == 'kvm'
 
 # SETUP MICRO TEXT EDITOR  ---------------------------------------------------
 
